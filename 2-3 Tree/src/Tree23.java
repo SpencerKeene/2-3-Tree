@@ -1,13 +1,18 @@
 
 public class Tree23 {
 	private class Node23 {
-		private int items[] = new int[3];
-		private Node23 children[] = new Node23[4];
-		private int numItems = 0;
+		private int[] items;
+		private Node23[] children;
+		private int numItems;
 
-		public Node23() {}
+		public Node23() {
+			items = new int[3];
+			children = new Node23[4];
+			numItems = 0;
+		}
 		
 		public Node23(int item) {
+			this();
 			items[0] = item;
 			numItems = 1;
 		}
@@ -15,31 +20,29 @@ public class Tree23 {
 		public void insert(int k) {
 			int i = numItems-1;
 			while (i >= 0) {
-				if (k < items[i]) {
-					items[i+1] = items[i];
-					--i;
-				}
-				else break;
+				if (items[i] < k) break;
+				items[i+1] = items[i];
+				--i;
 			}
 			items[i+1] = k;
 			++numItems;
 		}
 		
-		public void replace(Node23 n, Node23 n1, Node23 n2) {
-			if (n == children[0]) {
+		public void replaceChild(Node23 oldChild, Node23 newChild1, Node23 newChild2) {
+			if (oldChild == children[0]) {
 				children[3] = children[2];
 				children[2] = children[1];
-				children[1] = n2;
-				children[0] = n1;
+				children[1] = newChild2;
+				children[0] = newChild1;
 			}
-			else if (n == children[1]) {
+			else if (oldChild == children[1]) {
 				children[3] = children[2];
-				children[2] = n2;
-				children[1] = n1;
+				children[2] = newChild2;
+				children[1] = newChild1;
 			}
 			else {
-				children[3] = n2;
-				children[2] = n1;
+				children[3] = newChild2;
+				children[2] = newChild1;
 			}
 		}
  		
@@ -69,7 +72,8 @@ public class Tree23 {
 		
 		@Override
 		public String toString() {
-			return "Node values:  First: " + items[0] + (numItems == 2 ? "   Second: " + items[1] : "");
+			return "Node values:  First: " + items[0] 
+					+ (numItems == 2 ? "   Second: " + items[1] : "");
 		}
 	}
 	private Node23 root;
@@ -158,7 +162,7 @@ public class Tree23 {
 		}
 		
 		p.insert(n.items[1]);
-		p.replace(n, n1, n2);
+		p.replaceChild(n, n1, n2);
 		return p;
 	}
 
