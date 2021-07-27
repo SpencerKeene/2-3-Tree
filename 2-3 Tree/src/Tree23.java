@@ -1,6 +1,6 @@
 
 public class Tree23 {
-	private class Node23 {
+	private static class Node23 {
 		private int[] items;
 		private Node23[] children;
 		private int numItems;
@@ -15,6 +15,27 @@ public class Tree23 {
 			this();
 			items[0] = item;
 			numItems = 1;
+		}
+		
+		public Node23(Node23 child) {
+			this();
+			children[0] = child;
+		}
+		
+		public static Node23[] split(Node23 node) {
+			Node23[] newNodes = new Node23[2];
+			
+			newNodes[0] = new Node23(node.items[0]);
+			newNodes[1] = new Node23(node.items[2]);
+			
+			if (!node.isLeaf()) {
+				newNodes[0].children[0] = node.children[0];
+				newNodes[0].children[1] = node.children[1];
+				newNodes[1].children[0] = node.children[2];
+				newNodes[1].children[1] = node.children[3];
+			}
+			
+			return newNodes;
 		}
 		
 		public void insert(int k) {
@@ -46,6 +67,10 @@ public class Tree23 {
 			}
 		}
  		
+		public int getNumItems() {
+			return numItems;
+		}
+		
 		public int getSmallItem() {
 			return items[0];
 		}
@@ -93,7 +118,7 @@ public class Tree23 {
 	private Node23 find(int k, Node23 r) {
 		if (r == null) return null;
 		
-		if (r.numItems == 1) {
+		if (r.getNumItems() == 1) {
 			if (k == r.getSmallItem()) return r;
 			
 			if (k < r.getSmallItem()) return find(k, r.getLeft());
@@ -114,7 +139,7 @@ public class Tree23 {
 		}
 		else {
 			root = insert(k, root);
-			if (root.numItems == 3) root = split(root, null);	
+			if (root.getNumItems() == 3) root = split(root, null);	
 		}
 	}
 	
@@ -125,7 +150,7 @@ public class Tree23 {
 		}
 		
 		Node23 child = null;
-		if (r.numItems == 1) {
+		if (r.getNumItems() == 1) {
 			if (k == r.getSmallItem())
 				throw new Tree23Exception("Cannot insert duplicate element.");
 			
@@ -141,29 +166,19 @@ public class Tree23 {
 			else child = insert(k, r.getMiddle());
 		}
 		
-		if (child.numItems == 3) return split(child, r);
+		if (child.getNumItems() == 3) return split(child, r);
 		return r;
 	}
 	
-	private Node23 split(Node23 n, Node23 p) {
-		if (p == null) {
-			p = new Node23();
-			p.children[0] = n;
-		}
+	private Node23 split(Node23 node, Node23 parent) {
+		if (parent == null)
+			parent = new Node23(node);
+		parent.insert(node.getLargeItem());
 		
-		Node23 n1 = new Node23(n.items[0]);
-		Node23 n2 = new Node23(n.items[2]);
+		Node23[] newNodes = Node23.split(node);
+		parent.replaceChild(node, newNodes[0], newNodes[1]);
 		
-		if (!n.isLeaf()) {
-			n1.children[0] = n.children[0];
-			n1.children[1] = n.children[1];
-			n2.children[0] = n.children[2];
-			n2.children[1] = n.children[3];
-		}
-		
-		p.insert(n.items[1]);
-		p.replaceChild(n, n1, n2);
-		return p;
+		return parent;
 	}
 
 	public void emptyTree() {
@@ -194,7 +209,7 @@ public class Tree23 {
 		printInorder(r.getLeft());
 		System.out.println(r.getSmallItem());
 		printInorder(r.getMiddle());
-		if (r.numItems == 2) {
+		if (r.getNumItems() == 2) {
 			System.out.println(r.getLargeItem());
 			printInorder(r.getRight());
 		}
